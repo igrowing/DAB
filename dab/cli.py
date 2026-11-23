@@ -118,7 +118,7 @@ def main(argv: list[str] | None = None) -> int:
     for stream in (sys.stdout, sys.stderr):
         stream.reconfigure(encoding="utf-8")
     parser = _parser()
-    print(f"{meta.NAME} {meta.VERSION} ({meta.DESCRIPTION})")
+    print(f"{meta.NAME.upper()} {meta.VERSION}")
     if not (sys.argv[1:] if argv is None else argv):
         parser.print_help()
         return 0
@@ -133,8 +133,11 @@ def main(argv: list[str] | None = None) -> int:
         # Only the default location is created on demand; a mistyped --config must stay an error.
         if args.config.resolve() == DEFAULT_CONFIG.resolve() and config.create_starter(args.config):
             log.warning("no config found: created a starter at %s. Add your apps there and run again.", args.config)
-            return 2
+            return 0
         cfg = config.load(args.config)
+    except config.EmptyConfigError as exc:
+        log.warning("%s", exc)  # a fresh starter has no apps: say so, but it is not a failure
+        return 0
     except config.ConfigError as exc:
         log.error("config error: %s", exc)
         return 2

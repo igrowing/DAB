@@ -57,3 +57,9 @@ def test_override_for_unknown_extension_is_an_error(tmp_path: Path) -> None:
     body = f"APPS = {{{str(exe)!r}: ['.a']}}\nPROGID_OVERRIDES = {{'.b': 'X'}}"
     with pytest.raises(config.ConfigError, match="not in APPS"):
         config.load(_write(tmp_path, body))
+
+
+def test_empty_apps_is_reported_as_empty_not_as_broken(tmp_path: Path) -> None:
+    with pytest.raises(config.EmptyConfigError):
+        config.load(_write(tmp_path, "APPS = {}"))
+    assert issubclass(config.EmptyConfigError, config.ConfigError)

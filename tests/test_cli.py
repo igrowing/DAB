@@ -21,12 +21,14 @@ def test_missing_default_config_is_created_from_the_starter(
 ) -> None:
     target = tmp_path / "dab_config.py"
     monkeypatch.setattr(cli, "DEFAULT_CONFIG", target)
-    assert cli.main(["--list"]) == 2
+    assert cli.main(["--list"]) == 0
     assert target.read_text(encoding="utf-8") == default_config.TEMPLATE
     assert "created a starter" in caplog.text
-    # the starter is valid Python but has no apps yet, so the next run explains that instead of recreating it
-    assert cli.main(["--list"]) == 2
-    assert "APPS" in caplog.text
+    # the starter has no apps yet: the next run says so and succeeds, it must not treat that as an error
+    caplog.clear()
+    assert cli.main(["--list"]) == 0
+    assert "no applications" in caplog.text
+    assert not [r for r in caplog.records if r.levelname == "ERROR"]
     assert target.read_text(encoding="utf-8") == default_config.TEMPLATE
 
 

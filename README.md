@@ -10,7 +10,7 @@ you list which application should open which file extensions, and DAB restores t
 ## Quick start
 
 1. Put `dab.exe` in a folder of your choice and run it once: `dab.exe --list`.
-   It creates a starter `dab_config.py` next to itself and stops (exit code 2) so you can fill it in.
+   It creates a starter `dab_config.py` next to itself and stops (exit code 0) so you can fill it in.
 2. Edit `dab_config.py` (see below).
 3. Look before you change: `dab.exe --dry-run`.
 4. `dab.exe --apply`. It restores the associations **and** registers a scheduled task that repeats this after every
@@ -46,7 +46,7 @@ APPS = {
 PROGID_OVERRIDES = {}   # optional: {".ext": "Some.ProgId"} to force a specific ProgId
 ```
 
-* If the default config is missing, DAB writes the starter above (all examples commented out) and exits with code 2.
+* If the default config is missing, DAB writes the starter above (all examples commented out) and exits with code 0. A config without any application is also not an error: DAB says so and exits with 0.
 * An extension listed under several apps goes to the **last** one, with a warning in the log.
 * A listed exe that does not exist, or a malformed extension, is reported as a config error (exit code 2).
 

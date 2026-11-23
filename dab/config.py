@@ -18,6 +18,10 @@ class ConfigError(Exception):
     """The config file is missing or invalid."""
 
 
+class EmptyConfigError(ConfigError):
+    """The config is valid but lists no applications yet (e.g. the untouched starter): nothing to do, not a fault."""
+
+
 @dataclass(slots=True, frozen=True)
 class Config:
     # extension (lowercase, with dot) -> application exe path
@@ -55,8 +59,10 @@ def load(path: Path) -> Config:
     except Exception as exc:  # noqa: BLE001  # user code of any kind: report it as a config problem, with traceback
         raise ConfigError(f"cannot execute {path}: {exc!r}") from exc
     apps = ns.get("APPS")
-    if not isinstance(apps, dict) or not apps:
-        raise ConfigError(f"{path}: APPS is missing or empty; add your applications as {{exe path: [extensions]}}")
+    if not isinstance(apps, dict):
+        raise ConfigError(f"{path}: APPS is missing; add your applications as {{exe path: [extensions]}}")
+    if not apps:
+        raise EmptyConfigError(f"{path}: no applications in APPS yet; add them as {{exe path: [extensions]}}")
 
     wanted: dict[str, str] = {}
     for exe, exts in apps.items():
