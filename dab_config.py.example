@@ -1,0 +1,20 @@
+"""Your default apps. Edit this file; it is plain Python.
+
+APPS maps an application's exe path to the extensions it should open.
+PROGID_OVERRIDES (optional) forces a specific ProgId for an extension; normally not needed.
+"""
+
+APPS = {
+    r"C:\Program Files\IrfanView\i_view64.exe": [
+        ".jpg", ".jpeg", ".jpe", ".jfif", ".png", ".gif", ".bmp", ".ico", ".webp", ".tif", ".tiff",
+    ],
+    r"C:\portable\xmplay\xmplay.exe": [
+        ".mp3", ".flac", ".ogg", ".wav", ".m4a", ".wma", ".aac", ".opus",
+    ],
+    r"C:\Program Files\DAUM\PotPlayer\PotPlayerMini64.exe": [
+        ".3gp", ".asf", ".avi", ".divx", ".flv", ".m2ts", ".m4v", ".mkv", ".mov", ".mp4", ".mpeg", ".mpg",
+        ".mts", ".ogv", ".rmvb", ".vob", ".webm", ".wmv",
+    ],
+}
+
+PROGID_OVERRIDES: dict[str, str] = {}

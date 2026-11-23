@@ -1,0 +1,27 @@
+[project]
+name = "dab"
+version = "0.1.0"
+description = "Default Apps Back: restore your own file associations on Windows 11"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+extend-exclude = ["dab/latest_hash.py"]  # vendored from upstream, kept diffable
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "BLE", "FBT", "S"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]
+"dab/hashing.py" = ["S101"]
+"dab/registry.py" = ["S603", "S607"]

@@ -1,0 +1,3 @@
+dab/latest_hash.py and dab/uchash_tables.inc are taken from TheSlopMachine/FileAssocManager (tools/ref_hash.py,
+src/uchash_tables.inc), MIT License, which are in turn ports of cssxn/UserChoiceLatestHash (MIT License).
+dab/hashing.py ports the PS-SFTA algorithm, Copyright 2022 Danysys, MIT License.
