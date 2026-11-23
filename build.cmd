@@ -6,7 +6,7 @@ setlocal
 if "%PYTHON%"=="" set PYTHON=python
 set HERE=%~dp0
 "%PYTHON%" -m PyInstaller --noconfirm --clean --onefile --console --name dab ^
-  --copy-metadata dab ^
+  --add-data "%HERE%pyproject.toml;." ^
   --paths "%HERE%." ^
   --add-data "%HERE%dab\uchash_tables.inc;dab" ^
   --distpath "%HERE%dist" --workpath "%TEMP%\dab_build" --specpath "%TEMP%\dab_build" ^

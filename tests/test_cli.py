@@ -57,3 +57,41 @@ def test_options_without_a_mode_are_still_a_usage_error() -> None:
     with pytest.raises(SystemExit) as exc:
         cli.main(["--config", "x.py"])
     assert exc.value.code == 2
+
+
+class _ProtectedReg:
+    def effective_prog_id(self, name: str, *, protocol: bool = False) -> str | None:
+        return "Some.Prog" if name in {".pdf", "https"} else None
+
+    def get_user_choice(self, ext: str) -> None:
+        return None
+
+    def get_legacy_choice(self, ext: str) -> None:
+        return None
+
+    def prog_id_exe(self, prog_id: str) -> None:
+        return None
+
+    def openwith_progids(self, ext: str) -> list[str]:
+        return []
+
+    def exe_prog_ids(self, exe: str) -> list[str]:
+        return []
+
+    def application_prog_id(self, exe: str) -> None:
+        return None
+
+
+def test_dry_run_lists_protected_defaults(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    exe = tmp_path / "a.exe"
+    exe.write_bytes(b"")
+    cfg_file = tmp_path / "c.py"
+    cfg_file.write_text(f"APPS = {{{str(exe)!r}: ['.pdf']}}", encoding="utf-8")
+    monkeypatch.setattr(cli, "Registry", _ProtectedReg)
+    assert cli.main(["--dry-run", "--config", str(cfg_file)]) == 0
+    section = capsys.readouterr().out.split("set by hand")[1]
+    assert ".pdf" in section
+    assert "https" in section
+    assert "Some.Prog" in section

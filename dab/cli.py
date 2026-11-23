@@ -44,6 +44,11 @@ def _do_dry_run(cfg: config.Config, reg: Registry) -> int:
     for a in todo:
         print(f"would set {a.ext:10} {a.current or '-'}  ->  {a.target}   [{a.note}]")
     print(f"{len(todo)} of {len(cfg.wanted)} extensions would change")
+    print("\nProtected by Windows (DAB cannot change these; set by hand in Settings > Default apps):")
+    for d in planner.protected_defaults(cfg, reg):
+        now = (Path(d.current_exe).name if d.current_exe else d.current) if d.current else "-"
+        wanted = f"   (config wants {Path(d.wanted).name})" if d.wanted else ""
+        print(f"  {d.name:8} now={now}{wanted}")
     return 0
 
 

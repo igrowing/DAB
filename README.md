@@ -90,7 +90,8 @@ never as silent nothing.
 Limits:
 
 * `.pdf`, `.htm`, `.html`, `http` and `https` are additionally guarded by Windows (UCPD driver) and writes are refused.
-  `--dry-run` flags them; set those few by hand in Settings.
+  `--dry-run` flags them and lists who currently owns each of them (and what your config wants, if it lists
+  the extension); set those few by hand in Settings.
 * The algorithms are undocumented and reverse-engineered (credits in `NOTICE`); any Windows update can change them.
 
 ## Build and develop

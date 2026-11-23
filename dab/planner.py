@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 
 # Windows' User Choice Protection Driver (UCPD) blocks other processes from writing these.
 PROTECTED = frozenset({".htm", ".html", ".pdf"})
+PROTECTED_PROTOCOLS = ("http", "https")  # guarded the same way; DAB cannot configure them, only report them
 
 
 @dataclass(slots=True, frozen=True)
@@ -25,6 +26,24 @@ class Action:
     create_prog_id: bool
     needs_change: bool
     note: str
+
+
+@dataclass(slots=True, frozen=True)
+class ProtectedDefault:
+    name: str  # ".pdf" or "https"
+    current: str | None  # ProgId Windows really uses now
+    current_exe: str | None  # its exe when the ProgId has an open command (not for packaged apps)
+    wanted: str | None  # exe the config asks for, if it lists this extension
+
+
+def protected_defaults(cfg: Config, reg: Registry) -> list[ProtectedDefault]:
+    """Current defaults of the types Windows refuses to let DAB change, so the user knows what to set by hand."""
+    found: list[ProtectedDefault] = []
+    for name, protocol in [(e, False) for e in sorted(PROTECTED)] + [(p, True) for p in PROTECTED_PROTOCOLS]:
+        current = reg.effective_prog_id(name, protocol=protocol)
+        exe = reg.prog_id_exe(current) if current else None
+        found.append(ProtectedDefault(name, current, exe, cfg.wanted.get(name)))
+    return found
 
 
 def choose_prog_id(reg: Registry, ext: str, exe: str, override: str | None) -> tuple[str, bool, str]:

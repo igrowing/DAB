@@ -6,6 +6,7 @@ from dab.registry import UserChoice, command_exe, normalize_exe
 
 IRFAN = r"C:\Program Files\IrfanView\i_view64.exe"
 XMPLAY = r"C:\portable\xmplay\xmplay.exe"
+ACRO = r"C:\Acro\acro.exe"
 
 
 class FakeRegistry:
@@ -16,6 +17,10 @@ class FakeRegistry:
         self.openwith: dict[str, list[str]] = {}
         self.by_exe: dict[str, list[str]] = {}
         self.applications: dict[str, str] = {}
+        self.effective: dict[str, str] = {}
+
+    def effective_prog_id(self, name: str, *, protocol: bool = False) -> str | None:
+        return self.effective.get(("proto:" if protocol else "ext:") + name)
 
     def get_user_choice(self, ext: str) -> UserChoice | None:
         return UserChoice(self.choices[ext], "h", 0) if ext in self.choices else None
@@ -92,3 +97,16 @@ def test_override_wins_and_protected_types_are_flagged() -> None:
     [a] = planner.plan(cfg, reg)  # type: ignore[arg-type]
     assert a.target == "My.Html"
     assert "protects" in a.note
+
+
+def test_protected_defaults_show_who_owns_each_protected_type() -> None:
+    reg = FakeRegistry()
+    reg.effective = {"ext:.pdf": "AcroExch.Document", "proto:https": "ChromeHTML", "ext:.html": "AppXabc"}
+    reg.prog_exes = {"AcroExch.Document": ACRO}
+    found = {d.name: d for d in planner.protected_defaults(_cfg(pdf=IRFAN), reg)}
+    assert set(found) == {".htm", ".html", ".pdf", "http", "https"}
+    pdf = found[".pdf"]
+    assert (pdf.current, pdf.current_exe, pdf.wanted) == ("AcroExch.Document", ACRO, IRFAN)
+    https = found["https"]
+    assert (https.current, https.current_exe, https.wanted) == ("ChromeHTML", None, None)
+    assert found[".htm"].current is None  # no default at all is reported as such, not invented

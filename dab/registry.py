@@ -35,6 +35,7 @@ _IID_IAAR = "4E530B0A-E611-4C77-A3AC-9031D022281B"
 _COINIT_APARTMENTTHREADED = 2
 _CLSCTX_INPROC_SERVER = 1
 _AT_FILEEXTENSION = 0
+_AT_URLPROTOCOL = 1
 _AL_EFFECTIVE = 1
 _SHCNE_ASSOCCHANGED = 0x08000000
 _MAX_WRITE_ATTEMPTS = 5
@@ -192,8 +193,10 @@ class Registry:
         """The stored choice the running Windows actually reads."""
         return self.get_latest_choice(ext) if self.hash_version() >= 1 else self.get_legacy_choice(ext)
 
-    def effective_prog_id(self, ext: str) -> str | None:
-        """Ask Windows itself which ProgId opens ``ext``; this is the only reliable proof that a write was accepted."""
+    def effective_prog_id(self, name: str, *, protocol: bool = False) -> str | None:
+        """Ask Windows itself which ProgId opens extension (or URL protocol) ``name``.
+
+        This is the only reliable proof that a write was accepted."""
         ole32 = ctypes.WinDLL("ole32", use_last_error=True)
         ole32.CoInitializeEx.argtypes = [ctypes.c_void_p, wintypes.DWORD]
         ole32.CoInitializeEx.restype = ctypes.c_long
@@ -217,12 +220,12 @@ class Registry:
         )  # fmt: skip
         query = proto(vtable[3])  # IApplicationAssociationRegistration::QueryCurrentDefault
         out = ctypes.c_void_p()
-        hr = query(obj, ext, _AT_FILEEXTENSION, _AL_EFFECTIVE, ctypes.byref(out))
+        hr = query(obj, name, _AT_URLPROTOCOL if protocol else _AT_FILEEXTENSION, _AL_EFFECTIVE, ctypes.byref(out))
         # The COM object is intentionally not released: one short-lived process, a few queries.
         if hr & 0xFFFFFFFF in (_ERROR_NO_ASSOCIATION, _E_ELEMENT_NOT_FOUND):
             return None
         if hr != 0:
-            raise RegistryError(f"QueryCurrentDefault({ext}) failed: {_hresult(hr)}")
+            raise RegistryError(f"QueryCurrentDefault({name}) failed: {_hresult(hr)}")
         value = ctypes.wstring_at(out.value)
         ole32.CoTaskMemFree(out)
         return value

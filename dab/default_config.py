@@ -23,6 +23,12 @@ APPS = {
     #     ".3gp", ".asf", ".avi", ".divx", ".flv", ".m2ts", ".m4v", ".mkv", ".mov", ".mp4", ".mpeg", ".mpg",
     #     ".mts", ".ogv", ".rmvb", ".vob", ".webm", ".wmv",
     # ],
+    # r"C:\Program Files\Google\Chrome\Application\chrome.exe": [
+    #     ".htm", ".html", ".xhtml", ".shtml", ".xml", ".svg", ".webp",
+    # ],
+    # r"C:\Program Files (x86)\Foxit Software\Foxit PDF Reader\FoxitPDFReader.exe": [
+    #     ".pdf",
+    # ],
 }
 
 PROGID_OVERRIDES: dict[str, str] = {}
