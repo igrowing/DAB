@@ -61,9 +61,11 @@ def task_spec(args: argparse.Namespace, sid: str) -> scheduler.TaskSpec:
         parts += [_LOG, str(args.log.resolve())]
     if not FROZEN:
         parts = ["-m", meta.NAME, *parts]
+    # dab.exe is a console program, so a plain launch at logon would flash a window. conhost's --headless mode runs
+    # it with no window at all; the log file still gets the output.
     return scheduler.TaskSpec(
-        command=str(Path(sys.executable).resolve()),
-        arguments=subprocess.list2cmdline(parts),
+        command=scheduler.system_exe("conhost.exe"),
+        arguments=subprocess.list2cmdline(["--headless", str(Path(sys.executable).resolve()), *parts]),
         working_dir=str(_ROOT),
         sid=sid,
     )

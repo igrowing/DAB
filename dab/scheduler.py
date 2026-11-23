@@ -76,8 +76,12 @@ def build_xml(spec: TaskSpec) -> str:
 """
 
 
+def system_exe(name: str) -> str:
+    return os.path.join(os.environ.get("SystemRoot", r"C:\Windows"), "System32", name)
+
+
 def _run(args: list[str]) -> subprocess.CompletedProcess[bytes]:
-    schtasks = os.path.join(os.environ.get("SystemRoot", r"C:\Windows"), "System32", "schtasks.exe")
+    schtasks = system_exe("schtasks.exe")
     try:
         return subprocess.run([schtasks, *args], capture_output=True, check=False, timeout=60)  # noqa: S603  # fixed system binary
     except (OSError, subprocess.TimeoutExpired) as exc:

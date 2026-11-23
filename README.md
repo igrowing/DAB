@@ -58,7 +58,7 @@ arguments. If not, because it is missing or you moved the exe, it creates or rep
 as a warning and never stops the apply.
 
 The trigger is "at logon, delayed", not "at boot": associations live in your user registry, and a boot-time task has no
-signed-in user to write them for. The task runs as you, without elevation. A console window flashes briefly when it runs.
+signed-in user to write them for. The task runs as you, without elevation. It runs through `conhost.exe --headless`, so no console window appears; look in `dab.log` for what it did.
 
 ## How the ProgId is chosen
 

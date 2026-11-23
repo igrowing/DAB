@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import runpy
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -95,3 +97,13 @@ def test_dry_run_lists_protected_defaults(
     assert ".pdf" in section
     assert "https" in section
     assert "Some.Prog" in section
+
+
+def test_scheduled_task_runs_hidden_through_a_headless_console_host(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(cli, "FROZEN", True)  # the exe itself is the program, no "-m dab" prefix
+    args = cli._parser().parse_args(["--apply"])
+    spec = cli.task_spec(args, "S-1-5-21")
+    assert Path(spec.command).name.lower() == "conhost.exe"
+    assert Path(spec.command).parent.name.lower() == "system32"
+    exe = str(Path(sys.executable).resolve())
+    assert spec.arguments == subprocess.list2cmdline(["--headless", exe, "--apply"])
