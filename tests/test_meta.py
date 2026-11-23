@@ -26,4 +26,4 @@ def test_version_comes_from_pyproject_and_is_in_the_banner(capsys: pytest.Captur
     project = tomllib.loads((Path(__file__).parent.parent / "pyproject.toml").read_text(encoding="utf-8"))["project"]
     assert project["version"] == meta.VERSION
     assert cli.main([]) == 0
-    assert f"{meta.NAME} {meta.VERSION}" in capsys.readouterr().out
+    assert f"{meta.NAME.upper()} {meta.VERSION}" in capsys.readouterr().out
